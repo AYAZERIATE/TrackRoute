@@ -43,6 +43,7 @@ function useWindowWidth() {
 }
 
 // ── useAuth ────────────────────────────────────────────────────
+// ── useAuth ────────────────────────────────────────────────────
 function useAuth() {
   const [state, setState] = useState({ checked: false, authed: false });
 
@@ -51,14 +52,25 @@ function useAuth() {
 
     (async () => {
       try {
-        await api.get("/auth/me");
-        if (!cancelled) setState({ checked: true, authed: true });
+        await api.get("/me");
+
+        if (!cancelled) {
+          setState({ checked: true, authed: true });
+        }
       } catch {
-        if (!cancelled) setState({ checked: true, authed: false });
+        // Clear stale auth data so Login.jsx doesn't redirect back forever
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+
+        if (!cancelled) {
+          setState({ checked: true, authed: false });
+        }
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   return state;

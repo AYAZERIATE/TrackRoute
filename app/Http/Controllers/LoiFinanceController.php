@@ -2,104 +2,114 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
+use App\Models\LoiFinance;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class LoiFinanceController extends Controller
 {
-    /**
-     * CRUD minimal (mock-safe) pour le front.
-     */
-    public function index(Request $request): JsonResponse
+    // Afficher toutes les lois de finance
+    public function index(): JsonResponse
     {
+        $lois = LoiFinance::all();
+
         return response()->json([
-            'data' => [],
-            'total' => 0,
+            'data' => $lois,
+            'total' => $lois->count(),
         ]);
     }
 
+    // Ajouter une loi de finance
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'loiFinance' => ['required', 'string'],
-            'numeroDepense' => ['nullable', 'string'],
-            'rubrique' => ['nullable', 'string'],
-            'beneficiaire' => ['nullable', 'string'],
-            'objet' => ['nullable', 'string'],
-            'montantGlobal' => ['nullable', 'numeric'],
-            'montantCaution' => ['nullable', 'numeric'],
-            'montantRetenueGarantie' => ['nullable', 'numeric'],
-            'dernierDecompte' => ['nullable', 'numeric'],
-            'cp2026' => ['nullable', 'numeric'],
-            'ce2027' => ['nullable', 'numeric'],
-            'montantOrdonnance' => ['nullable', 'numeric'],
-            'resteAOrdonnancer' => ['nullable', 'numeric'],
-            'tauxEmission' => ['nullable', 'numeric'],
-            'dateAttribution' => ['nullable', 'string'],
-            'dateVisa' => ['nullable', 'string'],
-            'dateApprobation' => ['nullable', 'string'],
-            'dateNotificationApprobation' => ['nullable', 'string'],
-            'dateCommencement' => ['nullable', 'string'],
-            'datePVRD' => ['nullable', 'string'],
-            'dateApprobationDD' => ['nullable', 'string'],
-            'dateLiberationCautions' => ['nullable', 'string'],
+            'loiFinance' => 'required|string',
+            'numeroDepense' => 'nullable|string',
+            'rubrique' => 'nullable|string',
+            'beneficiaire' => 'nullable|string',
+            'objet' => 'nullable|string',
+            'montantGlobal' => 'nullable|numeric',
+            'montantCaution' => 'nullable|numeric',
+            'montantRetenueGarantie' => 'nullable|numeric',
+            'dernierDecompte' => 'nullable|numeric',
+            'cp2026' => 'nullable|numeric',
+            'ce2027' => 'nullable|numeric',
+            'montantOrdonnance' => 'nullable|numeric',
+            'resteAOrdonnancer' => 'nullable|numeric',
+            'tauxEmission' => 'nullable|numeric',
+            'dateAttribution' => 'nullable|date',
+            'dateVisa' => 'nullable|date',
+            'dateApprobation' => 'nullable|date',
+            'dateNotificationApprobation' => 'nullable|date',
+            'dateCommencement' => 'nullable|date',
+            'datePVRD' => 'nullable|date',
+            'dateApprobationDD' => 'nullable|date',
+            'dateLiberationCautions' => 'nullable|date',
         ]);
 
+        $loi = LoiFinance::create($validated);
+
         return response()->json([
-            'message' => 'Loi de finance créée (mock).',
-            'data' => array_merge($validated, ['id' => now()->timestamp]),
+            'message' => 'Loi de finance créée avec succès.',
+            'data' => $loi,
         ], 201);
     }
 
-    public function show(Request $request, int|string $id): JsonResponse
+    // Afficher une loi de finance
+    public function show($id): JsonResponse
     {
-        return response()->json([
-            'data' => [
-                'id' => $id,
-                'loiFinance' => '—',
-            ],
-        ]);
+        $loi = LoiFinance::findOrFail($id);
+
+        return response()->json($loi);
     }
 
-    public function update(Request $request, int|string $id): JsonResponse
+    // Modifier une loi de finance
+    public function update(Request $request, $id): JsonResponse
     {
+        $loi = LoiFinance::findOrFail($id);
+
         $validated = $request->validate([
-            'loiFinance' => ['sometimes', 'required', 'string'],
-            'numeroDepense' => ['sometimes', 'nullable', 'string'],
-            'rubrique' => ['sometimes', 'nullable', 'string'],
-            'beneficiaire' => ['sometimes', 'nullable', 'string'],
-            'objet' => ['sometimes', 'nullable', 'string'],
-            'montantGlobal' => ['sometimes', 'nullable', 'numeric'],
-            'montantCaution' => ['sometimes', 'nullable', 'numeric'],
-            'montantRetenueGarantie' => ['sometimes', 'nullable', 'numeric'],
-            'dernierDecompte' => ['sometimes', 'nullable', 'numeric'],
-            'cp2026' => ['sometimes', 'nullable', 'numeric'],
-            'ce2027' => ['sometimes', 'nullable', 'numeric'],
-            'montantOrdonnance' => ['sometimes', 'nullable', 'numeric'],
-            'resteAOrdonnancer' => ['sometimes', 'nullable', 'numeric'],
-            'tauxEmission' => ['sometimes', 'nullable', 'numeric'],
-            'dateAttribution' => ['sometimes', 'nullable', 'string'],
-            'dateVisa' => ['sometimes', 'nullable', 'string'],
-            'dateApprobation' => ['sometimes', 'nullable', 'string'],
-            'dateNotificationApprobation' => ['sometimes', 'nullable', 'string'],
-            'dateCommencement' => ['sometimes', 'nullable', 'string'],
-            'datePVRD' => ['sometimes', 'nullable', 'string'],
-            'dateApprobationDD' => ['sometimes', 'nullable', 'string'],
-            'dateLiberationCautions' => ['sometimes', 'nullable', 'string'],
+            'loiFinance' => 'sometimes|string',
+            'numeroDepense' => 'nullable|string',
+            'rubrique' => 'nullable|string',
+            'beneficiaire' => 'nullable|string',
+            'objet' => 'nullable|string',
+            'montantGlobal' => 'nullable|numeric',
+            'montantCaution' => 'nullable|numeric',
+            'montantRetenueGarantie' => 'nullable|numeric',
+            'dernierDecompte' => 'nullable|numeric',
+            'cp2026' => 'nullable|numeric',
+            'ce2027' => 'nullable|numeric',
+            'montantOrdonnance' => 'nullable|numeric',
+            'resteAOrdonnancer' => 'nullable|numeric',
+            'tauxEmission' => 'nullable|numeric',
+            'dateAttribution' => 'nullable|date',
+            'dateVisa' => 'nullable|date',
+            'dateApprobation' => 'nullable|date',
+            'dateNotificationApprobation' => 'nullable|date',
+            'dateCommencement' => 'nullable|date',
+            'datePVRD' => 'nullable|date',
+            'dateApprobationDD' => 'nullable|date',
+            'dateLiberationCautions' => 'nullable|date',
         ]);
 
+        $loi->update($validated);
+
         return response()->json([
-            'message' => 'Loi de finance mise à jour (mock).',
-            'data' => array_merge($validated, ['id' => $id]),
+            'message' => 'Loi de finance mise à jour.',
+            'data' => $loi,
         ]);
     }
 
-    public function destroy(Request $request, int|string $id): JsonResponse
+    // Supprimer une loi de finance
+    public function destroy($id): JsonResponse
     {
+        $loi = LoiFinance::findOrFail($id);
+
+        $loi->delete();
+
         return response()->json([
-            'message' => 'Loi de finance supprimée (mock).',
-            'id' => $id,
+            'message' => 'Loi de finance supprimée.',
         ]);
     }
 }
-

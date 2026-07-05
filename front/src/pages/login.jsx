@@ -177,7 +177,7 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const res = await api.post("auth/login", { email, password });
+const res = await api.post("login", { email, password });
       const { token, user } = res.data;
       if (!token) return setError("No token received from server.");
 

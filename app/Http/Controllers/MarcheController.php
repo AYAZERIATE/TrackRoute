@@ -2,80 +2,82 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\JsonResponse;
+use App\Models\Marche;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class MarcheController extends Controller
 {
-    /**
-     * CRUD minimal en JSON (données mock/safe).
-     */
-    public function index(Request $request): JsonResponse
+    // Afficher tous les marchés
+    public function index(): JsonResponse
     {
+        $marches = Marche::all();
+
         return response()->json([
-            'data' => [],
-            'total' => 0,
+            'data' => $marches,
+            'total' => $marches->count(),
         ]);
     }
 
+    // Ajouter un marché
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'nom' => ['required', 'string'],
-            'type' => ['nullable', 'string'],
-            'objet' => ['nullable', 'string'],
-            'montant' => ['nullable', 'numeric'],
-            'avancement' => ['nullable', 'string'],
-            'statut' => ['nullable', 'string'],
+            'nom' => 'required|string|max:255',
+            'type' => 'nullable|string|max:255',
+            'objet' => 'nullable|string',
+            'montant' => 'nullable|numeric',
+            'avancement' => 'nullable|string|max:255',
+            'statut' => 'nullable|string|max:255',
         ]);
 
+        $marche = Marche::create($validated);
+
         return response()->json([
-            'message' => 'Marché créé (mock).',
-            'data' => array_merge($validated, [
-                'id' => now()->timestamp,
-                'statut' => $validated['statut'] ?? 'En cours',
-            ]),
+            'message' => 'Marché créé avec succès.',
+            'data' => $marche,
         ], 201);
     }
 
-    public function show(Request $request, int|string $id): JsonResponse
+    // Afficher un marché
+    public function show($id): JsonResponse
     {
-        return response()->json([
-            'data' => [
-                'id' => $id,
-                'nom' => 'Marché (mock)',
-                'type' => null,
-                'objet' => null,
-                'montant' => 0,
-                'avancement' => null,
-                'statut' => 'En cours',
-            ],
-        ]);
+        $marche = Marche::findOrFail($id);
+
+        return response()->json($marche);
     }
 
-    public function update(Request $request, int|string $id): JsonResponse
+    // Modifier un marché
+    public function update(Request $request, $id): JsonResponse
     {
+        $marche = Marche::findOrFail($id);
+
         $validated = $request->validate([
-            'nom' => ['sometimes', 'required', 'string'],
-            'type' => ['sometimes', 'nullable', 'string'],
-            'objet' => ['sometimes', 'nullable', 'string'],
-            'montant' => ['sometimes', 'nullable', 'numeric'],
-            'avancement' => ['sometimes', 'nullable', 'string'],
-            'statut' => ['sometimes', 'nullable', 'string'],
+            'nom' => 'sometimes|required|string|max:255',
+            'type' => 'sometimes|nullable|string|max:255',
+            'objet' => 'sometimes|nullable|string',
+            'montant' => 'sometimes|nullable|numeric',
+            'avancement' => 'sometimes|nullable|string|max:255',
+            'statut' => 'sometimes|nullable|string|max:255',
         ]);
 
+        $marche->update($validated);
+
         return response()->json([
-            'message' => 'Marché mis à jour (mock).',
-            'data' => array_merge($validated, ['id' => $id]),
+            'message' => 'Marché mis à jour avec succès.',
+            'data' => $marche,
         ]);
     }
 
-    public function destroy(Request $request, int|string $id): JsonResponse
+    // Supprimer un marché
+    public function destroy($id): JsonResponse
     {
+        $marche = Marche::findOrFail($id);
+
+        $marche->delete();
+
         return response()->json([
-            'message' => 'Marché supprimé (mock).',
-            'id' => $id,
+            'message' => 'Marché supprimé avec succès.',
         ]);
     }
 }
-

@@ -3,7 +3,7 @@ import axios from "axios";
 const explicitBaseUrl = import.meta.env.VITE_BASEURL;
 const apiBase =
   // In dev, prefer same-origin so Vite can proxy `/api` and avoid CORS headaches.
-  import.meta.env.DEV ? "/api" : `${explicitBaseUrl ?? ""}/api`;
+import.meta.env.DEV ? "/api" : `${explicitBaseUrl ?? ""}`;
 
 const api = axios.create({
   baseURL: apiBase,

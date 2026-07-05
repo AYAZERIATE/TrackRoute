@@ -2,79 +2,82 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agenda;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AgendaController extends Controller
 {
-    /**
-     * Agenda: liste + CRUD minimal (mock-safe).
-     */
-    public function index(Request $request): JsonResponse
+    // Afficher tous les événements
+    public function index(): JsonResponse
     {
+        $agenda = Agenda::all();
+
         return response()->json([
-            'data' => [],
-            'total' => 0,
+            'data' => $agenda,
+            'total' => $agenda->count(),
         ]);
     }
 
+    // Ajouter un événement
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'title' => ['required', 'string'],
-            'description' => ['nullable', 'string'],
-            'date' => ['required', 'string'],
-            'priority' => ['nullable', 'string'],
-            'status' => ['nullable', 'string'],
-            'category' => ['nullable', 'string'],
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'date' => 'required|date',
+            'priority' => 'nullable|string',
+            'status' => 'nullable|string',
+            'category' => 'nullable|string',
         ]);
 
+        $agenda = Agenda::create($validated);
+
         return response()->json([
-            'message' => 'Événement créé (mock).',
-            'data' => array_merge($validated, [
-                'id' => now()->timestamp,
-            ]),
+            'message' => 'Événement créé avec succès.',
+            'data' => $agenda,
         ], 201);
     }
 
-    public function show(Request $request, int|string $id): JsonResponse
+    // Afficher un événement
+    public function show($id): JsonResponse
     {
-        return response()->json([
-            'data' => [
-                'id' => $id,
-                'title' => 'Événement (mock)',
-                'description' => null,
-                'date' => null,
-                'priority' => 'medium',
-                'status' => 'pending',
-                'category' => 'reunion',
-            ],
-        ]);
+        $agenda = Agenda::findOrFail($id);
+
+        return response()->json($agenda);
     }
 
-    public function update(Request $request, int|string $id): JsonResponse
+    // Modifier un événement
+    public function update(Request $request, $id): JsonResponse
     {
+        $agenda = Agenda::findOrFail($id);
+
         $validated = $request->validate([
-            'title' => ['sometimes', 'required', 'string'],
-            'description' => ['sometimes', 'nullable', 'string'],
-            'date' => ['sometimes', 'required', 'string'],
-            'priority' => ['sometimes', 'nullable', 'string'],
-            'status' => ['sometimes', 'nullable', 'string'],
-            'category' => ['sometimes', 'nullable', 'string'],
+            'title' => 'sometimes|string|max:255',
+            'description' => 'nullable|string',
+            'date' => 'sometimes|date',
+            'priority' => 'nullable|string',
+            'status' => 'nullable|string',
+            'category' => 'nullable|string',
         ]);
 
+        $agenda->update($validated);
+
         return response()->json([
-            'message' => 'Événement mis à jour (mock).',
-            'data' => array_merge($validated, ['id' => $id]),
+            'message' => 'Événement modifié avec succès.',
+            'data' => $agenda,
         ]);
     }
 
-    public function destroy(Request $request, int|string $id): JsonResponse
+    // Supprimer un événement
+    public function destroy($id): JsonResponse
     {
+        $agenda = Agenda::findOrFail($id);
+
+        $agenda->delete();
+
         return response()->json([
-            'message' => 'Événement supprimé (mock).',
-            'id' => $id,
+            'message' => 'Événement supprimé avec succès.',
         ]);
     }
 }
-

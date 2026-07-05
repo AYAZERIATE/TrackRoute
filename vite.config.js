@@ -10,9 +10,12 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
-    server: {
-        watch: {
-            ignored: ['**/storage/framework/views/**'],
-        },
-    },
+   server: {
+  proxy: {
+    '/api': {
+      target: 'http://127.0.0.1:8000', // must match artisan serve's actual port
+      changeOrigin: true,
+    }
+  }
+}
 });
